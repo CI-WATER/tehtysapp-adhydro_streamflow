@@ -1,0 +1,16 @@
+
+#app-navigation li {
+    list-style-type: none;
+}
+
+.nav_button{
+    margin: auto;
+}
+
+.table-overflow {
+    overflow-x:scroll;
+}
+
+.table-button {
+    width: 60px;
+}
