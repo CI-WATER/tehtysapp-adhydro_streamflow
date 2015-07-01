@@ -1,3 +1,6 @@
 [submodule "tethysapp/erfp_tool/sfpt_dataset_manager"]
 	path = tethysapp/erfp_tool/sfpt_dataset_manager
 	url = https://github.com/CI-WATER/sfpt_dataset_manager.git
+[submodule "tethysapp/adhydro_streamflow/sfpt_dataset_manager"]
+	path = tethysapp/adhydro_streamflow/sfpt_dataset_manager
+	url = https://github.com/CI-WATER/sfpt_dataset_manager.git
