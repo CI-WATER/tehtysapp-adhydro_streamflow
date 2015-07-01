@@ -133,7 +133,7 @@ var ERFP_MAP = (function() {
         var new_time_series = [];
         var conversion_factor = 1;
         if(m_units=="english") {
-            conversion_factor = 35.3146667;
+            conversion_factor = 3.28084;
         }
         time_series.map(function(data_row) {
             var new_data_array = [data_row[0]];
@@ -152,7 +152,7 @@ var ERFP_MAP = (function() {
         var conversion_factor = 1;
         try {
             if (m_units == "metric") {
-                conversion_factor = 35.3146667;
+                conversion_factor = 3.28084;
             }
             time_series.map(function(data) {
                if (series_name=="USGS") {
@@ -477,12 +477,12 @@ var ERFP_MAP = (function() {
             //turn off select interaction
             m_map.removeInteraction(m_select_interaction);
             addInfoMessage("Retrieving Data ...");
-            var y_axis_title = "Flow (cms)";
+            var y_axis_title = "Depth (m)";
             if (m_units == "english") {
-                y_axis_title = "Flow (cfs)";
+                y_axis_title = "Depth (ft)";
             }
             var default_chart_settings = {
-                title: { text: "Forecast"},
+                title: { text: "ADHydro Output"},
                 subtitle: {text: toTitleCase(m_selected_adhydro_watershed) + " (" +
                                  toTitleCase(m_selected_adhydro_subbasin) + "): " + m_selected_reach_id},
                 chart: {

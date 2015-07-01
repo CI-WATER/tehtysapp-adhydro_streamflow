@@ -24,7 +24,7 @@ $('#submit-changes-settings').click(function(){
     //check API Key Input
     var api_key = checkInputWithError($('#api-key-input'),safe_to_submit);
     //check output rapid-ecmwf files location
-    var adhydro_rapid_location = checkInputWithError($('#adhydro-location-input'),safe_to_submit);
+    var adhydro_location = checkInputWithError($('#adhydro-location-input'),safe_to_submit);
 
     //submit if inputs are ok
     if(safe_to_submit.val) {
@@ -39,7 +39,7 @@ $('#submit-changes-settings').click(function(){
         data = {
                 base_layer_id: base_layer_id,
                 api_key: api_key,
-                adhydro_rapid_location: adhydro_rapid_location,                    
+                adhydro_location: adhydro_location,                    
                 };
 
         ajax_update_database("update",data)

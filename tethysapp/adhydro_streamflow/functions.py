@@ -65,7 +65,6 @@ def delete_old_watershed_prediction_files(watershed):
     #initialize session
     session = SettingsSessionMaker()
     main_settings  = session.query(MainSettings).order_by(MainSettings.id).first()
-    forecast = forecast.lower()
     
     #Make sure that you don't delete if another watershed is using the
     #same predictions
@@ -79,9 +78,9 @@ def delete_old_watershed_prediction_files(watershed):
         .filter(Watershed.id != watershed.id) \
         .count()
     if num_adhydro_watersheds_with_forecast <= 0:
-        delete_prediciton_files(watershed.ecmwf_data_store_watershed_name, 
-                                watershed.ecmwf_data_store_subbasin_name, 
-                                main_settings.ecmwf_rapid_prediction_directory)
+        delete_prediciton_files(watershed.adhydro_data_store_watershed_name, 
+                                watershed.adhydro_data_store_subbasin_name, 
+                                main_settings.adhydro_prediction_directory)
     
     session.close()
               
@@ -150,10 +149,13 @@ def delete_old_watershed_files(watershed):
     Removes old watershed files from system
     """
     #remove old kml files
+    print 'delete kml'
     delete_old_watershed_kml_files(watershed)
     #remove old geoserver files
+    print 'delete geoserver'
     delete_old_watershed_geoserver_files(watershed)
     #remove old ADHydro prediction files
+    print 'delete watershed'
     delete_old_watershed_prediction_files(watershed)
 
 def adhydro_find_most_current_file(path_to_watershed_files, date_string):
@@ -221,30 +223,23 @@ def get_cron_command():
         delimiter = "\\"
     virtual_env_path = ""
     if delimiter and local_directory:
-        virtual_env_path = deladhydro_find_most_current_fileimiter.join(local_directory.split(delimiter)[:-4])
+        virtual_env_path = delimiter.join(local_directory.split(delimiter)[:-4])
         command = '%s %s' % (os.path.join(virtual_env_path,'bin','python'), 
                               os.path.join(local_directory, 'load_datasets.py'))
         return command
     else:
         return None
 
-def get_reach_index(reach_id, prediction_file, guess_index=None):
+def get_reach_index(reach_id, prediction_file):
     """
     Gets the index of the reach from the COMID 
     """
     data_nc = NET.Dataset(prediction_file, mode="r")
-    com_ids = data_nc.variables['COMID'][:]
+#    com_ids = len(data_nc.variables['channelSurfacewaterDepth'][0])-1
     data_nc.close()
     try:
-        if guess_index:
-            if int(reach_id) == int(com_ids[int(guess_index)]):
-                return int(guess_index)
-    except Exception as ex:
-        print ex
-        pass
-    
-    try:
-        reach_index = np.where(com_ids==int(reach_id))[0][0]
+        reach_index = reach_id
+#        reach_index = np.where(com_ids==int(reach_id))[0][0]
     except Exception as ex:
         print ex
         reach_index = None

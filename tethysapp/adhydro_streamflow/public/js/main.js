@@ -410,7 +410,7 @@ function deleteRowData(submit_button, data, div_id) {
             }
         })
         .fail(function(xhr, status, error) {
-            addErrorMessage(error, div_id);
+            appendErrorMessage(error, div_id);
         })
         .always(function(){
             submit_button.html(submit_button_html);

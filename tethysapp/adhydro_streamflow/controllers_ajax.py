@@ -9,6 +9,8 @@ from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import ObjectDeletedError
 from django.http import JsonResponse
+import jdcal
+import time
 
 #django imports
 from django.contrib.auth.decorators import user_passes_test
@@ -352,7 +354,8 @@ def adhydro_get_avaialable_dates(request):
         directory_count = 0
         for prediction_file in prediction_files:
             date_string = prediction_file.split("_")[1]
-            date = datetime.datetime.strptime(date_string,"%Y%m%dT%H%MZ")
+#            date = datetime.datetime.strptime(date_string,"%Y%m%dT%H%MZ")
+            date = 0
             path_to_file = os.path.join(path_to_watershed_files, prediction_file)
             if os.path.exists(path_to_file):
                 output_files.append({
@@ -370,7 +373,7 @@ def adhydro_get_avaialable_dates(request):
                     })
         else:
             return JsonResponse({'error' : 'Recent ADHydro forecasts for %s (%s) not found.' % (watershed_name, subbasin_name)})
-                    
+
 def adhydro_get_hydrograph(request):
     """""
     Returns ADHydro hydrograph
@@ -399,7 +402,6 @@ def adhydro_get_hydrograph(request):
         forecast_file = adhydro_find_most_current_file(path_to_output_files, date_string)
         if not forecast_file:
             return JsonResponse({'error' : 'ADHydro forecast for %s (%s) not found.' % (watershed_name, subbasin_name)})
-
         #get/check the index of the reach
         reach_index = get_reach_index(reach_id, forecast_file)
         if reach_index == None:
@@ -407,17 +409,19 @@ def adhydro_get_hydrograph(request):
 
         #get information from dataset
         data_nc = NET.Dataset(forecast_file, mode="r")
-        qout_dimensions = data_nc.variables['Qout'].dimensions
-        if qout_dimensions[0].lower() == 'comid' and \
-            qout_dimensions[1].lower() == 'time':
-            data_values = data_nc.variables['Qout'][reach_index,:]
-        else:
+        try:
+            data_values = data_nc.variables['channelSurfacewaterDepth'][:,reach_index]
+            jul_date = data_nc.variables['referenceDate'][0]
+            ref_date = jdcal.jd2gcal(jul_date,0)
+            ref_date_time = datetime.datetime(ref_date[0],ref_date[1],ref_date[2],int(ref_date[3]*24))
+            ref_time_utc = time.mktime(ref_date_time.timetuple())
+        except:
             data_nc.close()
             return JsonResponse({'error' : "Invalid ADHydro forecast file"})
 
         variables = data_nc.variables.keys()
-        if 'time' in variables:
-            time = [t*1000 for t in data_nc.variables['time'][:]]
+        if 'currentTime' in variables:
+            timeout = [(t+ref_time_utc)*1000 for t in data_nc.variables['currentTime'][:]]
         else:
             data_nc.close()
             return JsonResponse({'error' : "Invalid ADHydro forecast file"})
@@ -425,7 +429,7 @@ def adhydro_get_hydrograph(request):
 
         return JsonResponse({
                 "success" : "ADHydro data analysis complete!",
-                "adhydro" : zip(time, data_values.tolist()),
+                "adhydro" : zip(timeout, data_values.tolist()),
         })
 
 @user_passes_test(user_permission_test)
@@ -701,8 +705,12 @@ def watershed_delete(request):
             except ObjectDeletedError:
                 return JsonResponse({ 'error': "The watershed to delete does not exist." })
             main_settings  = session.query(MainSettings).order_by(MainSettings.id).first()
+            print 'between third and fourth'
             #remove watershed geoserver, kml, local prediction files, RAPID Input Files
-            delete_old_watershed_files(watershed, main_settings.adhydro_prediction_directory)
+            print watershed
+            print main_settings.adhydro_prediction_directory
+            delete_old_watershed_files(watershed)
+            print 'fouuuuuuuuuuuuuuuuuuurth'
             #delete watershed from database
             session.delete(watershed)
             session.commit()

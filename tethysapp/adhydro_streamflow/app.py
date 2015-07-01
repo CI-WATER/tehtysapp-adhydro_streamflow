@@ -11,7 +11,7 @@ class ADHydroChannelOutputViewer(TethysAppBase):
     icon = 'adhydro_streamflow/images/logo.png'
     package = 'adhydro_streamflow'
     root_url = 'adhydro-streamflow'
-    color = '#34495e'
+    color = '#800000'
         
     def url_maps(self):
         """
