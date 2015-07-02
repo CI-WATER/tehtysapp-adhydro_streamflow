@@ -39,8 +39,7 @@ Then install the app in Tethys Platform:
 $ . /usr/lib/tethys/bin/activate
 $ cd tethysapp-adhydro_streamflow
 $ python setup.py install
-$ tethys syncstores adhydro_streamflow
-$ python /usr/lib/tethys/src/manage.py collectstatic
+$ python manage collectstatic
 
 ```
 Restart the Apache Server:
@@ -63,8 +62,7 @@ $ . /usr/lib/tethys/bin/activate
 $ cd tethysapp-adhydro_streamflow
 $ git pull
 $ git submodule update
-$ tethys syncstores adhydro_streamflow
-$ python /usr/lib/tethys/src/manage.py collectstatic
+$ tethys manage collectstatic
 ```
 Restart the Apache Server:
 See: http://tethys-platform.readthedocs.org/en/1.0.0/production.html#enable-site-and-restart-apache
