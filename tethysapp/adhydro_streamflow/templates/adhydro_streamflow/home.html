@@ -1,10 +1,22 @@
 {% extends "adhydro_streamflow/base.html" %}
 
-{% load tethys_gizmos %}
+{% load tethys_gizmos static %}
 
 {% block app_content %}
-    <h4>Either...</h4>
-    <h1>Select a Watershed</h1>
+    <h1>Welcome to the ADHydro Channel Output Viewer App</h1>
+
+    <h4>How To Use</h4> 
+    <p><b>Non-Admin Users</b> will only be able to view already uploaded project output. You may skip to <b>Select a Watershed</b> to view an uploaded project</p>
+    <p><b>Admin Users</b> can upload a new project if they have the two necessary requierments below: <br>
+       1. A polyline shapefile with Arc Id's listed as a field attribute 'comid' in the same consecutive order as ADHydro outputs <br>
+       2. An extracted channelSurfacewaterDepth, currentTime, and referenceDate netCDF <br>
+        (see <a href="https://github.com/CI-WATER/tethysapp-adhydro_streamflow">README.md - Quick Setup</a> for more details)</p>
+             <img src="{% static 'adhydro_streamflow/images/workflow.JPG' %}" style="width:60%;height:300px;text-aligh:center">
+
+    
+
+
+    <h4>Select a Watershed</h4>
     {% if watersheds_length > 0 %}
         <form action="{% url 'adhydro_streamflow:map' %}" method="get">
             <p id="too-many-watersheds-alert" class="alert alert-warning hidden" role="alert"><em>Warning: Selecting too many watersheds can make the operation of the app slow.</em></p>
@@ -22,8 +34,8 @@
     <p class="help-block">Don't see the watershed you want? Add one
     <a href="{% url 'adhydro_streamflow:add-watershed' %}">here</a>.</p>
     {% endif %}
-    <h4>Or...</h4>
-    <h1>Select a Watershed Group</h1>
+    <h4></h4>
+    <h2></h2>
     {% if watershed_group_length > 0 %}
         <form action="{% url 'adhydro_streamflow:map' %}" method="get">
             {% gizmo select_input watershed_group_select %}
@@ -34,7 +46,12 @@
             </div>
         </form>
     {% else %}
-        <h4> No watershed groups found ...</h4>
+        <br>
+         <h6>Known Issues</h6>
+        <p>There is a currently known issue with the shapefile currently uploaded from the ADHydro files - the developers are still working on processing the arc segments so that they line up with the current output reference. Therefore, the data aligned with the arc is currently off but will be updated once the correct processing is available. </p>
+
+        <h6>Acknowledgements</h6>
+        <p>The components of this app are based off the workflow in the <a href"http://demo.tethys.ci-water.org/apps/erfp-tool/">Streamflow Prediction Tool</a> developed by Alan Snow at Brigham Young University.</p>
     {% endif %}
     {% if user.is_superuser or user.is_staff %}
     <p class="help-block">Don't see the watershed group you want? Add one
